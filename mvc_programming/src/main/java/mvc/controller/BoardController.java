@@ -1,6 +1,7 @@
 package mvc.controller;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 
 import jakarta.servlet.RequestDispatcher;
@@ -157,6 +158,7 @@ public class BoardController extends HttpServlet {
 
 				int value = bd2.boardUpdate(bv2); // boardDao에 있는 boardUpdate메서드 실행
 				paramMethod = "S";
+
 				if (value == 1) {
 					url = request.getContextPath() + "/board/boardContents.aws?bidx=" + bidx; // 수정된 게시물의 내용 보여주기
 				} else {
@@ -164,6 +166,17 @@ public class BoardController extends HttpServlet {
 																							// 페이지 보여주기
 				}
 
+			} else {
+				// 비밀번호가 다르면
+				response.setContentType("text/html; charset=UTF-8"); // 응답 콘텐츠 타입 설정
+				PrintWriter out = response.getWriter(); // PrintWriter 객체 가져오기
+
+				out.println("<script>");
+				out.println("alert('비밀번호가 다릅니다.');");
+				out.println(
+						"location.href='" + request.getContextPath() + "/board/boardModify.aws?bidx=" + bidx + "';");
+				out.println("</script>");
+				out.flush();
 			}
 			// 어떻게 수정됐는지 확인해야하니까 수정된 내용을 보여줘>
 			// 글내용 보기화면 > boardContents 여기로
