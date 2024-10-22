@@ -7,7 +7,7 @@
  ArrayList<BoardVo>alist = (ArrayList<BoardVo>)request.getAttribute("alist"); // 형변환 때문에 경고라인 뜬거 걱정 말기
 	//System.out.println("뭐가 나오나?"+alist); > 객체생성된거 확인해보기  인덱스창에서 목록 간다음 콘솔창 확인 
 	
-	PageMaker pm =(PageMaker)request.getAttribute("pm");
+	PageMaker pm = (PageMaker)request.getAttribute("pm");	// 여기서 pm 객체 꺼내옴
  %>
   
 <!DOCTYPE html>
@@ -96,7 +96,8 @@
 			<% for(int i = pm.getStartPage();i<=pm.getEndPage();i++){ %>
 			
 			<li style = "display:inline;">
-			<input type="button" value = "<%=i%>" onclick="location.href='<%=request.getContextPath() %>/board/boardList.aws?page=<%=i%>' " <%if (i ==pm.getCri().getPage()) {%> style="background-color:black; color:white; display:inline-block;"<%} %>>
+			<input type="button" value = "<%=i%>" onclick="location.href='<%=request.getContextPath() %>/board/boardList.aws?page=<%=i%>' "<%if (i ==pm.getCri().getPage()) {%>
+			  style="background-color:black; color:white; display:inline-block;"<%} %>>
 			</li>  <!-- 하단 페이지번호생성 -->
 			
 			<%} %>
