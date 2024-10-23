@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%
-
+// 여기서 가야 가상경로 > 진짜 경로 연결해둬서 작동됨 다른곳은 서버내에서 경로 못 찾아서 오류남
 String msg = "";
 if(session.getAttribute("msg")!=null) {
 	msg = (String)session.getAttribute("msg");

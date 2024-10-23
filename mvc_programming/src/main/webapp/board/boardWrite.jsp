@@ -1,5 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+    <%@ page import="mvc.vo.BoardVo"%>
+   <%
+   BoardVo bv = (BoardVo)request.getAttribute("bv");			// 강제 형변환으로 양쪽의 타입을 맞춰주자
+   %> 
    <%
     
     if(session.getAttribute("midx")==null){		// 회원번호가 널값이다 ? > 로그인 안했다는 것  로그인하라고 로그인 화면으로 보냄
@@ -37,8 +41,10 @@
 		}
 		let ans=confirm("저장하시겠습니까?");
 		if(ans==true) {
+			
 			fm.action="<%=request.getContextPath()%>/board/boardWriteAction.aws";
 			fm.method="post";
+			fm.enctype="multipart/form-data";		// 문자를 넘길때 어떤 형태로 넘길건지 지정한다
 			fm.submit();
 		}
 		return;
@@ -78,7 +84,7 @@
 	비밀번호<input type="password" name = "password">
 	<hr>
 	첨부파일
-	<input type="button" name="filecheck" value="파일선택">선택된 파일 없음
+	<input type="button" name="filename" value="파일선택" onclick ="">선택된 파일 없음
 	<hr>
 	<input type="button" id="save" value="저장" onclick="saveBtn();" style="float: right;">
 	<input type="button" id="cancel" value="취소" onclick="history.back();" style="float: right;">

@@ -45,7 +45,7 @@ public class BoardDao {
 				String subject = rs.getString("Subject");
 				// String contents = rs.getString("contents");
 				String writer = rs.getString("Writer");
-				// int recom = rs.getInt("recom");
+				int recom = rs.getInt("recom");
 				int viewcnt = rs.getInt("Viewcnt");
 				// String filename = rs.getString("filename");
 				String writeday = rs.getString("Writeday");
@@ -61,7 +61,7 @@ public class BoardDao {
 				bv.setSubject(subject);
 				// bv.setContents(contents);
 				bv.setWriter(writer);
-				// bv.setRecom(recom);
+				bv.setRecom(recom);
 				bv.setViewcnt(viewcnt);
 				// bv.setFilename(filename);
 				bv.setWriteday(writeday);
@@ -176,7 +176,7 @@ public class BoardDao {
 		return value; // 성공하면 2 리턴
 	}
 
-	// 게시물 내용 가져오는 쿼리 작성하기 > 이거 활용해서 수정하기 페이지에도 뿌려줄 수 있나?
+	// 게시물 내용 가져오는 쿼리 작성하기
 	public BoardVo boardSelectOne(int bidx) { // 받아올 게시물 번호 이걸로 뭐할거냐면 게시물 클릭하면>그 게시물 내용 보여줄거야 db에서 가져와서
 		// 제목 내용 조회수 작성일 작성자 등등 꺼내와서 세팅해주는 메서드 만들기
 		// 1. 형식부터 만든다
@@ -239,6 +239,7 @@ public class BoardDao {
 
 	public int boardUpdate(BoardVo bv) { // 게시물 수정하는 메서드 생성
 		int value = 0;
+
 		// 쿼리 작성하고 가져와 문자열 sql에 담기
 		String sql = "UPDATE board set subject =?, contents=?, writer=?,modifyday=now() where bidx=? and PASSWORD=?";
 
@@ -268,4 +269,60 @@ public class BoardDao {
 		return value;
 	}
 
+	public int boardViewCntUpdate(int bidx) {
+		int value = 0;
+		String sql = "UPDATE board SET viewcnt = viewcnt+1 where bidx=?";
+		try {
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, bidx);
+			value = pstmt.executeUpdate(); // 실행되면 1 안되면 0 리턴
+
+		} catch (SQLException e) {
+
+			e.printStackTrace();
+		} finally {
+			try {
+				pstmt.close();
+				// conn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+
+		return value;
+	}
+
+	public int boardRecomUpdate(int bidx) {
+		int value = 0;
+		int recom = 0;
+		String sql = "UPDATE board SET recom = recom+1 where bidx=?";
+		String sql2 = "select recom from board where bidx=?";
+		ResultSet rs = null;
+
+		try {
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, bidx);
+			value = pstmt.executeUpdate(); // 실행되면 1 안되면 0 리턴 업데이트 = +1 해준다
+			pstmt = conn.prepareStatement(sql2);
+			pstmt.setInt(1, bidx);
+			rs = pstmt.executeQuery(); // 쿼리 실행 하라는 뜻 결과값을 담아라~
+
+			if (rs.next() == true) {
+				recom = rs.getInt("recom"); // rs 가 값이 있으면 추천수 꺼낼거임
+			}
+
+		} catch (SQLException e) {
+
+			e.printStackTrace();
+		} finally {
+			try {
+				pstmt.close();
+				// conn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+
+		return recom; // 리턴값 추천수
+	}
 }

@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
+import com.oreilly.servlet.multipart.DefaultFileRenamePolicy;
+
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -72,6 +74,20 @@ public class BoardController extends HttpServlet {
 		} else if (location.equals("boardWriteAction.aws")) {
 			// System.out.println("boardWriteAction.aws");
 			// 1. 파라미터 값을 넘겨 받는다
+
+			// 라이브러리 방식
+			// C:\Users\admin\git\mvc_programming\MVC\mvc_programming\src\main\webapp\images
+			// // 깃 연동되어 있는 레파지토리
+			String savePath = "C:\\Users\\admin\\git\\mvc_programming\\MVC\\mvc_programming\\src\\main\\webapp\\images";
+			int sizeLimit = 15 * 1024 * 1024; // 15메가를 올리겠다(15M)
+			String dataType = "UTF-8";
+			DefaultFileRenamePolicy policy = new DefaultFileRenamePolicy();
+
+			// MultipartRequest multi = new MultipartRequest(request, savePath, sizeLimit,
+			// dataType, policy); // 톰캣 버전 9에서는
+			// 실행되는 명령어
+			// > 10.1에서는
+			// 안된다
 			String subject = request.getParameter("subject");
 			String contents = request.getParameter("contents");
 			String writer = request.getParameter("writer");
@@ -103,7 +119,8 @@ public class BoardController extends HttpServlet {
 				// 3. 처리후 이동한다 sendRedirect방식으로
 			}
 
-		} else if (location.equals("boardContents.aws")) {
+		} else if (location.equals("boardContents.aws")) { // 제목 클릭하고 들어오면 조회수 1 씩 증가시키는 메서드 호출해서 클릭과 동시에 조회수 올려주자
+
 			// 1. 넘어온 값 담기
 			// System.out.println("bidx 넘어왔는지 확인 : " + bidx);
 			String bidx = request.getParameter("bidx"); // 통신객체로 넘어온 bidx를 받아서 문자열로 담는다
@@ -111,8 +128,11 @@ public class BoardController extends HttpServlet {
 
 			// 2. 처리하기
 
-			BoardDao bd = new BoardDao();
-			BoardVo bv = bd.boardSelectOne(bidxInt); // 여기서 메서드 작동하도록 담아주자
+			BoardDao bd = new BoardDao(); // 객체 생성하고
+			// update하는 쿼리 만들자 > 조회수 증가하는 쿼리
+			bd.boardViewCntUpdate(bidxInt);
+			BoardVo bv = bd.boardSelectOne(bidxInt); // 여기서 메서드 작동하도록 담아주자(해당되는 bidx데이터 가져오기)
+
 			// 화면으로 가져가자
 			request.setAttribute("bv", bv); // 같은 영역 내부 안에서 JSP페이지를 보여주자
 
@@ -133,8 +153,7 @@ public class BoardController extends HttpServlet {
 			url = "/board/boardModify.jsp"; // 이쪽으로 보내자 ~ 실제 경로
 
 		} else if (location.equals("boardModifyAction.aws")) { // 이 주소가 오면
-
-			System.out.println("boardModifyAction.aws");
+			// System.out.println("boardModifyAction.aws");
 
 			String subject = request.getParameter("subject");
 			String contents = request.getParameter("contents");
@@ -182,6 +201,23 @@ public class BoardController extends HttpServlet {
 			// 글내용 보기화면 > boardContents 여기로
 			// 보낸다
 			// 보내려면 게시물 번호가 있어야 하니까 bidx 값을 넣어준다
+
+		} else if (location.equals("boardRecom.aws")) { // 추천버튼 누르면
+			String bidx = request.getParameter("bidx"); // board의 기본키값인 bidx > 파라미터값 요청해서 가져와 //
+														// :request.getParameter("bidx") 이걸 문자열로 담아서 변수로 사용
+			int bidxInt = Integer.parseInt(bidx); // 숫자형으로 다시 변경해서 사용
+
+			BoardDao bd = new BoardDao();
+			int recom = bd.boardRecomUpdate(bidxInt);
+
+			PrintWriter out = response.getWriter();
+			out.println("{\"recom\":\"" + recom + "\"}"); // ({\"키값\":\"value값\"}"); > json형식
+
+			/*
+			 * 이 방식으로ㅓ 하면 추천수 + 조회수 같이 증가한다 추천수만 올리고 싶으면 ajax 방식으로 해결하자 paramMethod = "S";
+			 * >>컨트롤러에 ajax 구현함 // sendRedirect방식 url = request.getContextPath() +
+			 * "/board/boardContents.aws?bidx=" + bidx;
+			 */
 
 		}
 
